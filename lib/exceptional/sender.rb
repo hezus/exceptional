@@ -1,6 +1,5 @@
 require 'zlib'
 require 'cgi'
-require 'httparty'
 require 'net/https'
 require 'digest/md5'
 
@@ -47,16 +46,11 @@ module Exceptional
         client.use_ssl = config.ssl?
         client.verify_mode = OpenSSL::SSL::VERIFY_NONE if config.ssl?
         begin
-          response = HTTParty.post(
-            'http://localhost:3000/' + url,
-            :headers => {
+          response = client.post(url, data, {
               'Content-Type' => 'binary',
               'Accept-Encoding' => 'gzip,deflate,sdch',
               'Accept-Language' => 'en-US,en;q=0.8,pt;q=0.6'
-            },
-            :body => data
-          )
-          #response = client.post(url, data)
+            })
           case response
             when Net::HTTPSuccess
               Exceptional.logger.info("#{url} - #{response.message}")
